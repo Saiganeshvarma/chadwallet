@@ -6,6 +6,7 @@ import { Activity, TrendingUp, TrendingDown, RefreshCw } from 'lucide-react'
 import { formatPrice, formatAddress, formatTimeAgo } from '@/lib/utils'
 import { Skeleton } from './ui/skeleton'
 import { getTokenTrades } from '@/lib/birdeye'
+import type { BirdeyeTradeItem } from '@/types/birdeye'
 
 interface Trade {
   txHash: string
@@ -32,13 +33,13 @@ export function LiveTrades({ tokenAddress, symbol }: LiveTradesProps) {
     try {
       const data = await getTokenTrades(tokenAddress)
       const items = (data.data?.items ?? []).map(
-        (t: Record<string, unknown>) => ({
-          txHash: (t.txHash as string) ?? (t.signature as string) ?? `${t.blockUnixTime}-${t.owner}`,
-          type: (t.side as string) === 'buy' || (t.type as string) === 'buy' ? 'buy' : 'sell',
-          amount: Number(t.volumeUSD) || Number(t.amount) || 0,
+        (t: BirdeyeTradeItem) => ({
+          txHash: t.txHash ?? t.signature ?? `${t.blockUnixTime}-${t.owner}`,
+          type: t.side === 'buy' ? 'buy' : 'sell',
+          amount: Number(t.volumeUSD) || 0,
           price: Number(t.price) || 0,
-          wallet: (t.wallet as string) || (t.owner as string) || 'Unknown',
-          timestamp: Number(t.timestamp) || Number(t.blockUnixTime) || Date.now() / 1000,
+          wallet: t.owner || 'Unknown',
+          timestamp: t.blockUnixTime || Date.now() / 1000,
         })
       )
       setTrades(items)
