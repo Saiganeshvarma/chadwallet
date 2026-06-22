@@ -84,7 +84,11 @@ export function WalletButton() {
         <div className="hidden sm:block">
           <div className="text-white text-xs font-medium">{shortDisplay}</div>
           <div className="text-white/40 text-xs">
-            {solBalance !== null ? `${solBalance.toFixed(4)} SOL` : 'Loading…'}
+            {!address
+              ? 'No wallet'
+              : solBalance !== null
+              ? `${solBalance.toFixed(4)} SOL`
+              : 'Loading…'}
           </div>
         </div>
         <ChevronDown className={`w-3.5 h-3.5 text-white/40 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
@@ -114,13 +118,19 @@ export function WalletButton() {
               </div>
               <div className="mt-3 p-3 rounded-lg bg-white/5 border border-white/5">
                 <div className="text-xs text-white/40">SOL Balance</div>
-                <div className="text-lg font-bold text-gradient">
-                  {solBalance !== null ? `${solBalance.toFixed(4)} SOL` : '—'}
-                </div>
-                {solBalance !== null && solPrice > 0 && (
-                  <div className="text-xs text-white/30">
-                    ${(solBalance * solPrice).toFixed(2)} USD
-                  </div>
+                {address ? (
+                  <>
+                    <div className="text-lg font-bold text-gradient">
+                      {solBalance !== null ? `${solBalance.toFixed(4)} SOL` : 'Loading…'}
+                    </div>
+                    {solBalance !== null && solPrice > 0 && (
+                      <div className="text-xs text-white/30">
+                        ${(solBalance * solPrice).toFixed(2)} USD
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-sm text-white/30 mt-0.5">No wallet connected</div>
                 )}
               </div>
             </div>

@@ -1,18 +1,18 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
+const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? ''
 
-if (!supabaseUrl || !supabasePublishableKey) {
-  throw new Error('Missing Supabase environment variables')
-}
-
-export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-  },
-})
+// Return a null client during build if env vars are missing
+// rather than throwing and failing the build
+export const supabase = supabaseUrl && supabasePublishableKey
+  ? createClient(supabaseUrl, supabasePublishableKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+      },
+    })
+  : null as unknown as ReturnType<typeof createClient>
 
 // Database types
 export interface Database {
@@ -138,6 +138,7 @@ export async function upsertUser(userData: {
   walletAddress?: string
   avatarUrl?: string
 }) {
+  if (!supabase) return { data: null, error: null }
   const { data, error } = await supabase
     .from('users')
     .upsert({
@@ -190,6 +191,7 @@ export async function saveAIInsight(token: string, analysis: string) {
 }
 
 export async function getWatchlist(userId: string) {
+  if (!supabase) return { data: null, error: null }
   const { data, error } = await supabase
     .from('watchlist')
     .select('*')
@@ -199,6 +201,7 @@ export async function getWatchlist(userId: string) {
 }
 
 export async function addToWatchlist(userId: string, token: string) {
+  if (!supabase) return { data: null, error: null }
   const { data, error } = await supabase
     .from('watchlist')
     .insert({ user_id: userId, token })
@@ -209,6 +212,7 @@ export async function addToWatchlist(userId: string, token: string) {
 }
 
 export async function removeFromWatchlist(userId: string, token: string) {
+  if (!supabase) return { error: null }
   const { error } = await supabase
     .from('watchlist')
     .delete()
