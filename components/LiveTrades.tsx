@@ -35,7 +35,7 @@ export function LiveTrades({ tokenAddress, symbol }: LiveTradesProps) {
       const items = (data.data?.items ?? []).map(
         (t: BirdeyeTradeItem) => ({
           txHash: t.txHash ?? t.signature ?? `${t.blockUnixTime}-${t.owner}`,
-          type: t.side === 'buy' ? 'buy' : 'sell',
+          type: (t.side === 'buy' ? 'buy' : 'sell') as 'buy' | 'sell',
           amount: Number(t.volumeUSD) || 0,
           price: Number(t.price) || 0,
           wallet: t.owner || 'Unknown',

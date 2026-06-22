@@ -108,9 +108,10 @@ function mockPrice(address: string): number {
 function mockTokenData(address: string) {
   const price  = mockPrice(address)
   const info   = KNOWN_TOKENS[address] ?? { symbol: 'UNK', name: 'Unknown Token', logoURI: '' }
-  const change = MOCK_CHANGES[address] ?? (Math.random() - 0.4) * 20
+  const change = MOCK_CHANGES[address] ?? 0
   return {
     address,
+    decimals: 9,
     symbol: info.symbol,
     name: info.name,
     logoURI: info.logoURI,
@@ -118,6 +119,7 @@ function mockTokenData(address: string) {
     priceChange24h: change,
     v24hChangePercent: change,
     v24h: price * 1_200_000,
+    volume24h: price * 1_200_000,
     liquidity: price * 5_000_000,
     mc: price * 500_000_000,
     holder: 150_000,
@@ -273,6 +275,8 @@ export async function getTrendingTokens(limit = 20): Promise<BirdeyeTrendingResp
   if (!BIRDEYE_API_KEY) {
     const tokens = TOP_TOKENS.map((addr, i) => ({
       ...mockTokenData(addr),
+      decimals: 9,
+      volume24h: mockPrice(addr) * 1_200_000,
       price24hChangePercent: MOCK_CHANGES[addr] ?? 0,
       rank: i + 1,
     }))
@@ -293,6 +297,8 @@ export async function getTrendingTokens(limit = 20): Promise<BirdeyeTrendingResp
     console.error('[Birdeye] getTrendingTokens error:', err)
     const tokens = TOP_TOKENS.map((addr, i) => ({
       ...mockTokenData(addr),
+      decimals: 9,
+      volume24h: mockPrice(addr) * 1_200_000,
       price24hChangePercent: MOCK_CHANGES[addr] ?? 0,
       rank: i + 1,
     }))
